@@ -65,12 +65,14 @@ def get_next_day_str(today):
 
 def read_csv():
     FILENAME = 'mails.csv'
-    reader = None
+    NAME_IDX = 1
+    DOB_IDX = 2
+    MAIL_IDX = 3
+
     try:
         reader = csv.reader(open(FILENAME, 'rt'), delimiter=',')
     except IOError, e:
-        print "Please place your csv data file to this directory"
-
+        print "PLEASE PLACE YOUR CSV DATA FILE TO THIS DIRECTORY"
     else:
         all_mails = []
         today = datetime.now()
@@ -81,10 +83,10 @@ def read_csv():
         tomorrow_birth = []
 
         for row in reader:
-            name = row[1].strip()
-            dob = row[2]
+            name = row[NAME_IDX].strip()
+            dob = row[DOB_IDX]
             dmy = dob.split("/")
-            mail = row[3]
+            mail = row[MAIL_IDX]
             all_mails.append(mail)
 
             #TODO fix dob with only 1 digit
@@ -112,6 +114,7 @@ def read_csv():
 
 def main():
     read_csv()
+
 
 if __name__ == "__main__":
     main()
