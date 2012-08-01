@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 
 SMTP_SERVER  = 'smtp.gmail.com'
 SMTP_PORT = 587
-
 ACCOUNT_FILE = "account.txt"
+
 
 def read_account(filename):
     with open(filename, 'rt') as f:
@@ -17,9 +17,6 @@ def read_account(filename):
 
 def send_mail(recipient, subject, body):
     str_all_mails = ', '.join(recipient)
-    """
-    Send happy bithday mail
-    """
     headers = ["From: " + sender,
                "Subject: " + subject,
                "To: " + str_all_mails,
@@ -38,8 +35,8 @@ def send_mail(recipient, subject, body):
     smtp.sendmail(sender, recipient, headers + "\r\n\r\n" + body)
     print "Sent to ", 
     print recipient
-
     smtp.quit()
+
 
 def send_happybirthday(recipient):
     body = """Happy birthday to you!
