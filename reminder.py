@@ -65,46 +65,49 @@ def get_next_day_str(today):
 
 def read_csv():
     FILENAME = 'mails.csv'
-    reader = csv.reader(open(FILENAME, 'rt'), delimiter=',')
+    reader = None
+    try:
+        reader = csv.reader(open(FILENAME, 'rt'), delimiter=',')
+    except IOError, e:
+        print "Please place your csv data file to this directory"
 
-    today = datetime.now()
-    tomorrow = get_next_day(today)
+    else:
+        all_mails = []
+        today = datetime.now()
+        str_today = convert_to_string(today)
+        str_tomorrow = get_next_day_str(today)
 
-    all_mails = []
-    str_today = convert_to_string(today)
-    str_tomorrow = convert_to_string(tomorrow)
+        print 'Today is ', str_today
+        tomorrow_birth = []
 
-    print 'Today is ', str_today
-    tomorrow_birth = []
+        for row in reader:
+            name = row[1].strip()
+            dob = row[2]
+            dmy = dob.split("/")
+            mail = row[3]
+            all_mails.append(mail)
 
-    for row in reader:
-        name = row[1].strip()
-        dob = row[2]
-        dmy = dob.split("/")
-        mail = row[3]
-        all_mails.append(mail)
+            #TODO fix dob with only 1 digit
+            birth_date = dmy[0] + "/" + dmy[1]
+            if str_today == birth_date:
+                print 'Happy birthday %s' % name
 
-        #TODO fix dob with only 1 digit
-        birth_date = dmy[0] + "/" + dmy[1]
-        if str_today == birth_date:
-            print 'Happy birthday %s' % name
+                try:
+                    send_happybirthday(mail)
+                except Exception, e:
+                    print e
 
-            try:
-                send_happybirthday(mail)
-            except Exception, e:
-                print e
+            elif str_tomorrow == birth_date:
+                tomorrow_birth.append(name)
+                print "Tomorrow is %s's birthday" % name
 
-        elif str_tomorrow == birth_date:
-            tomorrow_birth.append(name)
-            print "Tomorrow is %s's birthday" % name
+        # Remove empty string
+        all_mails = filter(None, all_mails)
+        print '%s mails: ' % len(all_mails)
 
-    # Remove empty string
-    all_mails = filter(None, all_mails)
-    print '%s mails: ' % len(all_mails)
-
-    if tomorrow_birth:
-        all_tomorrow = ', '.join(tomorrow_birth)
-        send_notification(all_mails, all_tomorrow)
+        if tomorrow_birth:
+            all_tomorrow = ', '.join(tomorrow_birth)
+            send_notification(all_mails, all_tomorrow)
         
 
 def main():
