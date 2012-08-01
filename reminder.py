@@ -6,11 +6,13 @@ from datetime import datetime, timedelta
 SMTP_SERVER  = 'smtp.gmail.com'
 SMTP_PORT = 587
 
-sender = 'bot.c2k8pro@gmail.com'
+ACCOUNT_FILE = "account.txt"
 
-password = None
-with open('pass', 'rt') as f:
-    password = f.read().strip('\n')
+def read_account(filename):
+    with open(filename, 'rt') as f:
+        sender  = f.read().strip()
+        password = f.read().strip()
+    return (sender, password)
 
 
 def send_mail(recipient, subject, body):
@@ -30,7 +32,7 @@ def send_mail(recipient, subject, body):
     smtp.ehlo()
     smtp.starttls()
     smtp.ehlo
-    smtp.login(sender, password)
+    smtp.login(read_account(ACCOUNT_FILE))
     
     body = "" + body +""
     smtp.sendmail(sender, recipient, headers + "\r\n\r\n" + body)
@@ -48,8 +50,20 @@ def send_happybirthday(recipient):
 
 
 def send_notification(all_mails, names):
-    body = """Tomorrow is birthday of %s""" % names
+    tomorrow = get_next_day_str(datetime.now())
+    body = """Tomorrow (%s) is birthday of %s""" % (tomorrow, names)
     send_mail(all_mails, body,  body)
+
+
+def convert_to_string(date):
+    str_format = "%d/%m"
+    return date.strftime(str_format)
+
+
+def get_next_day_str(today):
+    one_day = timedelta(days=1)
+    tomorrow = today + one_day
+    return convert_to_string(tomorrow)
 
 
 def read_csv():
@@ -57,16 +71,15 @@ def read_csv():
     reader = csv.reader(open(FILENAME, 'rt'), delimiter=',')
 
     today = datetime.now()
-    one_day = timedelta(days=1)
-    tomorrow = today + one_day
+    tomorrow = get_next_day(today)
 
     all_mails = []
-    str_format = "%d/%m"
-    str_today = today.strftime(str_format)
-    str_tomorrow = tomorrow.strftime(str_format)
+    str_today = convert_to_string(today)
+    str_tomorrow = convert_to_string(tomorrow)
 
     print 'Today is ', str_today
     tomorrow_birth = []
+
     for row in reader:
         name = row[1].strip()
         dob = row[2]
@@ -90,9 +103,7 @@ def read_csv():
 
     # Remove empty string
     all_mails = filter(None, all_mails)
-    #all_mails = ['hvnsweeting@gmail.com']
-    #all_mails.append('bot.c2k8pro@gmail.com')
-    print 'All mails: ', len(all_mails)
+    print '%s mails: ' % len(all_mails)
 
     if tomorrow_birth:
         all_tomorrow = ', '.join(tomorrow_birth)
@@ -105,3 +116,4 @@ def main():
 if __name__ == "__main__":
     main()
 
+    # NOTE : not test
