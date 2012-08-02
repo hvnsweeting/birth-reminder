@@ -6,17 +6,18 @@ from datetime import datetime, timedelta
 SMTP_SERVER  = 'smtp.gmail.com'
 SMTP_PORT = 587
 ACCOUNT_FILE = "account.txt"
-
+MAILSLIST = 'mails.csv'
 
 def read_account(filename):
     with open(filename, 'rt') as f:
-        sender  = f.read().strip()
-        password = f.read().strip()
+        sender  = f.readline().strip()
+        password = f.readline().strip()
     return (sender, password)
 
 
 def send_mail(recipient, subject, body):
     str_all_mails = ', '.join(recipient)
+    sender, passwd = read_account(ACCOUNT_FILE)
     headers = ["From: " + sender,
                "Subject: " + subject,
                "To: " + str_all_mails,
@@ -29,7 +30,7 @@ def send_mail(recipient, subject, body):
     smtp.ehlo()
     smtp.starttls()
     smtp.ehlo
-    smtp.login(read_account(ACCOUNT_FILE))
+    smtp.login(sender, passwd)
     
     body = "" + body +""
     smtp.sendmail(sender, recipient, headers + "\r\n\r\n" + body)
@@ -64,13 +65,12 @@ def get_next_day_str(today):
 
 
 def read_csv():
-    FILENAME = 'mails.csv'
     NAME_IDX = 1
     DOB_IDX = 2
     MAIL_IDX = 3
 
     try:
-        reader = csv.reader(open(FILENAME, 'rt'), delimiter=',')
+        reader = csv.reader(open(MAILSLIST, 'rt'), delimiter=',')
     except IOError, e:
         print "PLEASE PLACE YOUR CSV DATA FILE TO THIS DIRECTORY"
     else:
@@ -118,5 +118,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    # NOTE : not test
