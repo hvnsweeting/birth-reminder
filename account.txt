@@ -1,2 +1,3 @@
-YOUR_EMAIL
-YOUR_PASSWORD
+[account]
+username = YOUR_EMAIL
+password = YOUR_PASSWORD

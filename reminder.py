@@ -15,6 +15,7 @@ DATEFILE = 'last_check.txt'
 
 log = logging.getLogger("reminder")
 
+
 def read_account(filename):
     conparser = SafeConfigParser()
     conparser.read(filename)
