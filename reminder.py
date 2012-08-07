@@ -6,7 +6,7 @@ from ConfigParser import SafeConfigParser
 
 SMTP_SERVER  = 'smtp.gmail.com'
 SMTP_PORT = 587
-ACCOUNT_FILE = "account.txt.bkp"
+ACCOUNT_FILE = "account.txt"
 MAILSLIST = 'mails.csv'
 DATEFILE = 'last_check.txt'
 
