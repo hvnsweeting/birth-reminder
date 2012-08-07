@@ -1,18 +1,26 @@
 #!/usr/bin/env python
 import smtplib
 import csv
+import os
+import logging
 from datetime import datetime, timedelta
+from ConfigParser import SafeConfigParser
+
 
 SMTP_SERVER  = 'smtp.gmail.com'
 SMTP_PORT = 587
 ACCOUNT_FILE = "account.txt"
 MAILSLIST = 'mails.csv'
+DATEFILE = 'last_check.txt'
+
+log = logging.getLogger("reminder")
 
 def read_account(filename):
-    with open(filename, 'rt') as f:
-        sender  = f.readline().strip()
-        password = f.readline().strip()
-    return (sender, password)
+    conparser = SafeConfigParser()
+    conparser.read(filename)
+    user = conparser.get('account', 'username')
+    password = conparser.get('account', 'password')
+    return (user, password)
 
 
 def send_mail(recipient, subject, body):
@@ -34,12 +42,14 @@ def send_mail(recipient, subject, body):
     
     body = "" + body +""
     smtp.sendmail(sender, recipient, headers + "\r\n\r\n" + body)
+    log.info("Sent mail to %s", recipient)
     print "Sent to ", 
     print recipient
     smtp.quit()
 
 
 def send_happybirthday(recipient):
+    log.info("Send happy birthday to %s", recipient)
     body = """Happy birthday to you!
             \n<br/>From C2k8pro with love
             \n<br/>http://c2.familug.org"""
@@ -48,6 +58,7 @@ def send_happybirthday(recipient):
 
 
 def send_notification(all_mails, names):
+    log.info("Tomorrow is birthday of %s", names)
     tomorrow = get_next_day_str(datetime.now())
     body = """Tomorrow (%s) is birthday of %s""" % (tomorrow, names)
     send_mail(all_mails, body,  body)
@@ -113,6 +124,10 @@ def read_csv():
         
 
 def main():
+    LOG_PATH = "birthreminder.log"
+    logging.basicConfig(level=logging.DEBUG, filename=(os.path.abspath(LOG_PATH)), 
+                format="%(asctime)s %(name)s %(levelname)s %(message)s",)
+    log.info("Checked")
     read_csv()
 
 
