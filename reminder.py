@@ -2,17 +2,20 @@
 import smtplib
 import csv
 from datetime import datetime, timedelta
+from ConfigParser import SafeConfigParser
 
 SMTP_SERVER  = 'smtp.gmail.com'
 SMTP_PORT = 587
-ACCOUNT_FILE = "account.txt"
+ACCOUNT_FILE = "account.txt.bkp"
 MAILSLIST = 'mails.csv'
+DATEFILE = 'last_check.txt'
 
 def read_account(filename):
-    with open(filename, 'rt') as f:
-        sender  = f.readline().strip()
-        password = f.readline().strip()
-    return (sender, password)
+    conparser = SafeConfigParser()
+    conparser.read(filename)
+    user = conparser.get('account', 'username')
+    password = conparser.get('account', 'password')
+    return (user, password)
 
 
 def send_mail(recipient, subject, body):
