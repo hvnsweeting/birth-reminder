@@ -130,9 +130,11 @@ def read_csv():
 
 def main():
     LOG_PATH = "birthreminder.log"
-    logging.basicConfig(level=logging.DEBUG, filename=(os.path.abspath(LOG_PATH)), 
-                format="%(asctime)s %(name)s %(levelname)s %(message)s",)
+    logging.basicConfig(level=logging.DEBUG,
+                        filename=(fix_path(LOG_PATH)), 
+                        format="%(asctime)s %(name)s %(levelname)s %(message)s",)
     log.info("Checked")
+    send_mail(["bot.c2k8pro@gmail.com"], "Checked", convert_to_string(datetime.now()))
     read_csv()
 
 
