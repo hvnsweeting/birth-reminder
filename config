@@ -1,0 +1,10 @@
+[account]
+username = YOUR_EMAIL
+password = YOUR_PASSWORD
+
+[smtp]
+server  = smtp.gmail.com
+port = 587
+
+[file]
+mails_data = mails.csv
