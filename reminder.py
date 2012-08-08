@@ -2,31 +2,35 @@
 import smtplib
 import csv
 import os
+import sys
 import logging
 from datetime import datetime, timedelta
 from ConfigParser import SafeConfigParser
 
-
-SMTP_SERVER  = 'smtp.gmail.com'
-SMTP_PORT = 587
-ACCOUNT_FILE = "account.txt"
-MAILSLIST = 'mails.csv'
-DATEFILE = 'last_check.txt'
-
 log = logging.getLogger("reminder")
 
 
-def read_account(filename):
-    conparser = SafeConfigParser()
-    conparser.read(filename)
-    user = conparser.get('account', 'username')
-    password = conparser.get('account', 'password')
-    return (user, password)
+def fix_path(filename):
+    filepath = os.path.realpath(__file__)
+    path = os.path.dirname(filepath)
+    fixed = os.path.join(path, filename)
+    return fixed
+
+
+FILENAME = "config"
+conparser = SafeConfigParser()
+conparser.read(fix_path(FILENAME))
+
+SMTP_SERVER  = conparser.get("smtp", "server")
+SMTP_PORT = conparser.get("smtp", "port")
+MAILSLIST = fix_path(conparser.get("file", "mails_data"))
+USERNAME = conparser.get('account', 'username')
+PASSWORD = conparser.get('account', 'password')
 
 
 def send_mail(recipient, subject, body):
     str_all_mails = ', '.join(recipient)
-    sender, passwd = read_account(ACCOUNT_FILE)
+    sender, passwd = USERNAME, PASSWORD
     headers = ["From: " + sender,
                "Subject: " + subject,
                "To: " + str_all_mails,
