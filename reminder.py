@@ -3,9 +3,9 @@ import smtplib
 import csv
 import logging
 from datetime import datetime, timedelta
-from ConfigParser import SafeConfigParser
+
 import utils
-import confparser 
+import confparser
 
 
 log = logging.getLogger(__name__)
@@ -30,19 +30,19 @@ def send_mail(recipient, subject, body):
                "To: " + str_all_mails,
                "MIME-Version: 1.0",
                "Content-Type: text/html"]
-    
-    headers = "\r\n".join(headers) 
-    
+
+    headers = "\r\n".join(headers)
+
     smtp = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
     smtp.ehlo()
     smtp.starttls()
     smtp.ehlo
     smtp.login(sender, passwd)
-    
-    body = "" + body +""
+
+    body = "" + body + ""
     smtp.sendmail(sender, recipient, headers + "\r\n\r\n" + body)
     log.info("Sent mail to %s", recipient)
-    print "Sent to ", 
+    print "Sent to ",
     print recipient
     smtp.quit()
 
@@ -52,7 +52,7 @@ def send_happybirthday(recipient):
     body = """Happy birthday to you!
             \n<br/>From C2k8pro with love
             \n<br/>http://c2.familug.org"""
-    subject ='[BirthReminder] Happy birthday to you! from C2k8pro'
+    subject = '[BirthReminder] Happy birthday to you! from C2k8pro'
     send_mail(recipient, subject, body)
 
 
@@ -60,7 +60,7 @@ def send_notification(all_mails, names):
     log.info("Tomorrow is birthday of %s", names)
     tomorrow = tmr_ddmm_from(datetime.now())
     body = """Tomorrow (%s) is birthday of %s""" % (tomorrow, names)
-    subject ='[BirthReminder]' + body
+    subject = '[BirthReminder]' + body
     send_mail(all_mails, subject,  body)
 
 
@@ -73,6 +73,7 @@ def tmr_ddmm_from(today):
     one_day = timedelta(days=1)
     tomorrow = today + one_day
     return ddmm_from(tomorrow)
+
 
 # new function for refactor
 def people_from_csv(filename):
@@ -88,13 +89,13 @@ def people_from_csv(filename):
                 name = row[NAME_IDX].strip()
                 dob = row[DOB_IDX]
                 dmy = dob.split("/")
-                #TODO fix dob with only 1 digit
+                # TODO fix dob with only 1 digit
                 sdmbirth = dmy[0] + "/" + dmy[1]
                 mail = row[MAIL_IDX]
 
                 people[name] = {'dob': sdmbirth, 'email': mail}
             return people
-    except IOError, e:
+    except IOError:
         print "PLEASE PLACE YOUR CSV DATA FILE TO THIS DIRECTORY"
 
 
@@ -102,6 +103,7 @@ def mails_from(people):
     all_mails = [people[p]['email'] for p in people]
     all_mails = filter(None, all_mails)
     return all_mails
+
 
 def check_birthday(date):
     people = people_from_csv(MAILSLIST)
@@ -130,21 +132,24 @@ def check_birthday(date):
         send_notification(all_mails, all_tomorrow)
 
     return (len(today_birth), len(tomorrow_birth))
-        
+
 
 # TODO rewrite
 def main():
     LOG_PATH = "birthreminder.log"
-    logging.basicConfig(level=logging.DEBUG,
-                        filename=(utils.fix_path(LOG_PATH)), 
-                        format="%(asctime)s %(name)s %(levelname)s %(message)s",)
+    logging.basicConfig(
+        level=logging.DEBUG,
+        filename=(utils.fix_path(LOG_PATH)),
+        format="%(asctime)s %(name)s %(levelname)s %(message)s"
+    )
     today = datetime.today()
     stoday = ddmm_from(today)
     log.info("Checking %s ..." % stoday + "...")
     ctd, ctmr = check_birthday(today)
     log.info("Checked %s , %d today - %d tomorrow" % (stoday, ctd, ctmr))
 
-    #send_mail(["bot.c2k8pro@gmail.com"], "Checked", ddmm_from(datetime.now()))
+    # send_mail(["bot.c2k8pro@gmail.com"],
+    #           "Checked", ddmm_from(datetime.now()))
 
 
 def test():
