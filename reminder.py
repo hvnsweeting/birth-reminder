@@ -42,8 +42,6 @@ def send_mail(recipient, subject, body):
     body = "" + body + ""
     smtp.sendmail(sender, recipient, headers + "\r\n\r\n" + body)
     log.info("Sent mail to %s", recipient)
-    print "Sent to ",
-    print recipient
     smtp.quit()
 
 
@@ -96,7 +94,7 @@ def people_from_csv(filename):
                 people[name] = {'dob': sdmbirth, 'email': mail}
             return people
     except IOError:
-        print "PLEASE PLACE YOUR CSV DATA FILE TO THIS DIRECTORY"
+        raise IOError("PLEASE PLACE YOUR CSV DATA FILE TO THIS DIRECTORY")
 
 
 def mails_from(people):
@@ -148,15 +146,15 @@ def main():
     ctd, ctmr = check_birthday(today)
     log.info("Checked %s , %d today - %d tomorrow" % (stoday, ctd, ctmr))
 
-    # send_mail(["bot.c2k8pro@gmail.com"],
-    #           "Checked", ddmm_from(datetime.now()))
+    send_mail(["bot.c2k8pro@gmail.com"],
+              "Checked", ddmm_from(datetime.now()))
 
 
 def test():
     pp = people_from_csv(MAILSLIST)
     mails = mails_from(pp)
-    print pp
-    print mails
+    log.debug(pp)
+    log.debug(mails)
     date = datetime(2013, 2, 9)
     check_birthday(date)
 
