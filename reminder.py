@@ -1,21 +1,44 @@
 #!/usr/bin/env python
-import smtplib
 import csv
 import logging
+import os
+import smtplib
 from datetime import datetime, timedelta
-
-import utils
-import confparser
-
+from ConfigParser import SafeConfigParser
 
 log = logging.getLogger(__name__)
 
 
-MAILSLIST = confparser._CFG_['csv_path']
-SMTP_SERVER = confparser._CFG_['server']
-SMTP_PORT = confparser._CFG_['port']
-USERNAME = confparser._CFG_['user']
-PASSWORD = confparser._CFG_['passwd']
+def _get_full_path(filename):
+    filepath = os.path.realpath(__file__)
+    path = os.path.dirname(filepath)
+    fixed = os.path.join(path, filename)
+    return fixed
+
+
+def parse_config(FILENAME):
+    scpr = SafeConfigParser()
+    scpr.read(_get_full_path(FILENAME))
+
+    SMTP_SERVER = scpr.get("smtp", "server")
+    SMTP_PORT = scpr.get("smtp", "port")
+    USERNAME = scpr.get('account', 'username')
+    PASSWORD = scpr.get('account', 'password')
+    CSVPATH = _get_full_path(scpr.get("file", "mails_data"))
+
+    return {'user': USERNAME,
+            'passwd': PASSWORD,
+            'server': SMTP_SERVER,
+            'port': SMTP_PORT,
+            'csv_path': CSVPATH}
+
+FILENAME = "birthrmd.cfg"
+_CFG_ = parse_config(FILENAME)
+MAILSLIST = _CFG_['csv_path']
+SMTP_SERVER = _CFG_['server']
+SMTP_PORT = _CFG_['port']
+USERNAME = _CFG_['user']
+PASSWORD = _CFG_['passwd']
 
 
 def send_mail(recipient, subject, body):
@@ -137,7 +160,7 @@ def main():
     LOG_PATH = "birthreminder.log"
     logging.basicConfig(
         level=logging.DEBUG,
-        filename=(utils.fix_path(LOG_PATH)),
+        filename=(_get_full_path(LOG_PATH)),
         format="%(asctime)s %(name)s %(levelname)s %(message)s"
     )
     today = datetime.today()
